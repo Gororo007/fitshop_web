@@ -1,4 +1,4 @@
-﻿import 'package:fitshop_web/state/cart_notifier.dart';
+import 'package:fitshop_web/state/cart_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

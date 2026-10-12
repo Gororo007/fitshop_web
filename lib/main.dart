@@ -110,8 +110,11 @@ class _FitShopAppState extends State<FitShopApp> {
         Provider<OrderItemRepository>(
           create: (_) => PbOrderItemRepository(client),
         ),
-        ProxyProvider2<CustomerRepository, LoyaltyCardRepository,
-            UserRepository>(
+        ProxyProvider2<
+          CustomerRepository,
+          LoyaltyCardRepository,
+          UserRepository
+        >(
           update: (_, customers, loyalty, previous) => PbUserRepository(
             client,
             customers: customers,

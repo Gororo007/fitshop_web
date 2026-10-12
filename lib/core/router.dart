@@ -171,10 +171,7 @@ GoRouter createRouter(AuthNotifier auth) {
             builder: (context, state) => const CartScreen(),
           ),
           // Старый URL → корзина (совместимость со ссылками).
-          GoRoute(
-            path: '/checkout',
-            redirect: (context, state) => '/cart',
-          ),
+          GoRoute(path: '/checkout', redirect: (context, state) => '/cart'),
           GoRoute(
             path: '/fulfillment',
             builder: (context, state) => const FulfillmentScreen(),

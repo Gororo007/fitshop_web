@@ -125,9 +125,7 @@ class _UsersScreenState extends State<UsersScreen> {
             TextButton(
               onPressed: () {
                 Clipboard.setData(
-                  ClipboardData(
-                    text: '${created.email}\n${created.password}',
-                  ),
+                  ClipboardData(text: '${created.email}\n${created.password}'),
                 );
                 Navigator.of(ctx).pop();
               },
@@ -425,10 +423,7 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
                   ),
                   items: [
                     for (final r in UserRole.values)
-                      DropdownMenuItem(
-                        value: r,
-                        child: Text(userRoleLabel(r)),
-                      ),
+                      DropdownMenuItem(value: r, child: Text(userRoleLabel(r))),
                   ],
                   onChanged: (r) {
                     if (r != null) setState(() => _role = r);

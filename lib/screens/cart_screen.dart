@@ -244,13 +244,7 @@ class _CartScreenState extends State<CartScreen> {
                         Expanded(flex: 2, child: right),
                       ],
                     )
-                  : Column(
-                      children: [
-                        left,
-                        const SizedBox(height: 16),
-                        right,
-                      ],
-                    ),
+                  : Column(children: [left, const SizedBox(height: 16), right]),
             );
           },
         );
@@ -340,9 +334,7 @@ class _CartScreenState extends State<CartScreen> {
         onTap: () => context.go('/products/${p.id}'),
         child: Text(p.name),
       ),
-      subtitle: Text(
-        '${formatMoney(p.price)} · на складе ${p.stock} шт.',
-      ),
+      subtitle: Text('${formatMoney(p.price)} · на складе ${p.stock} шт.'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

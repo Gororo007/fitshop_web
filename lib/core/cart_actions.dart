@@ -13,11 +13,7 @@ void addProductToCart(BuildContext context, Product product, {int qty = 1}) {
     return;
   }
   final cart = context.read<CartNotifier>();
-  final inCart = cart.add(
-    product.id,
-    qty: qty,
-    maxStock: product.stock,
-  );
+  final inCart = cart.add(product.id, qty: qty, maxStock: product.stock);
   final messenger = ScaffoldMessenger.maybeOf(context);
   messenger
     ?..hideCurrentSnackBar()
