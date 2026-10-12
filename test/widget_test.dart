@@ -2,6 +2,7 @@ import 'package:fitshop_web/core/api_client.dart';
 import 'package:fitshop_web/main.dart';
 import 'package:fitshop_web/repositories/pb_auth_repository.dart';
 import 'package:fitshop_web/state/auth_notifier.dart';
+import 'package:fitshop_web/state/cart_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +21,7 @@ void main() {
         apiClient: client,
         authRepository: repo,
         authNotifier: auth,
+        cartNotifier: CartNotifier(prefs),
       ),
     );
     await tester.pumpAndSettle();

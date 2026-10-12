@@ -68,13 +68,16 @@ class Permissions {
     if (path.startsWith('/fulfillment')) {
       return can(user, AppPermission.manageOrders);
     }
-    if (path.startsWith('/checkout')) {
+    if (path.startsWith('/cart') || path.startsWith('/checkout')) {
       return user.role == UserRole.customer;
     }
     if (path.startsWith('/my-orders')) {
       return can(user, AppPermission.viewMyOrders);
     }
-    if (path.contains('/new') || path.contains('/edit')) {
+    // Только сегменты `new` / `edit`, не id вида "newsomething".
+    final segments = path.split('/').where((s) => s.isNotEmpty).toList();
+    final isFormPath = segments.contains('new') || segments.contains('edit');
+    if (isFormPath) {
       if (path.startsWith('/products') ||
           path.startsWith('/categories') ||
           path.startsWith('/brands') ||

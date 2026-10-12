@@ -12,6 +12,7 @@ import 'repositories/catalog_repositories.dart';
 import 'repositories/pb_auth_repository.dart';
 import 'repositories/user_repository.dart';
 import 'state/auth_notifier.dart';
+import 'state/cart_notifier.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ Future<void> main() async {
   final authRepository = PbAuthRepository(apiClient, prefs);
   final authNotifier = AuthNotifier(authRepository);
   await authNotifier.restore();
+  final cartNotifier = CartNotifier(prefs, userId: authNotifier.user?.id);
 
   runApp(
     FitShopApp(
@@ -29,6 +31,7 @@ Future<void> main() async {
       apiClient: apiClient,
       authRepository: authRepository,
       authNotifier: authNotifier,
+      cartNotifier: cartNotifier,
     ),
   );
 }
@@ -40,12 +43,14 @@ class FitShopApp extends StatefulWidget {
     required this.apiClient,
     required this.authRepository,
     required this.authNotifier,
+    required this.cartNotifier,
   });
 
   final SharedPreferences prefs;
   final ApiClient apiClient;
   final AuthRepository authRepository;
   final AuthNotifier authNotifier;
+  final CartNotifier cartNotifier;
 
   @override
   State<FitShopApp> createState() => _FitShopAppState();
@@ -55,7 +60,18 @@ class _FitShopAppState extends State<FitShopApp> {
   late final GoRouter _router = createRouter(widget.authNotifier);
 
   @override
+  void initState() {
+    super.initState();
+    widget.authNotifier.addListener(_syncCartUser);
+  }
+
+  void _syncCartUser() {
+    widget.cartNotifier.bindUser(widget.authNotifier.user?.id);
+  }
+
+  @override
   void dispose() {
+    widget.authNotifier.removeListener(_syncCartUser);
     _router.dispose();
     super.dispose();
   }
@@ -69,6 +85,7 @@ class _FitShopAppState extends State<FitShopApp> {
         Provider<ApiClient>.value(value: client),
         Provider<AuthRepository>.value(value: widget.authRepository),
         ChangeNotifierProvider<AuthNotifier>.value(value: widget.authNotifier),
+        ChangeNotifierProvider<CartNotifier>.value(value: widget.cartNotifier),
         Provider<ProductRepository>(create: (_) => PbProductRepository(client)),
         Provider<CategoryRepository>(
           create: (_) => PbCategoryRepository(client),
@@ -93,7 +110,14 @@ class _FitShopAppState extends State<FitShopApp> {
         Provider<OrderItemRepository>(
           create: (_) => PbOrderItemRepository(client),
         ),
-        Provider<UserRepository>(create: (_) => PbUserRepository(client)),
+        ProxyProvider2<CustomerRepository, LoyaltyCardRepository,
+            UserRepository>(
+          update: (_, customers, loyalty, previous) => PbUserRepository(
+            client,
+            customers: customers,
+            loyaltyCards: loyalty,
+          ),
+        ),
       ],
       child: MaterialApp.router(
         title: 'FitShop',

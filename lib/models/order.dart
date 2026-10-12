@@ -97,6 +97,29 @@ class ShopOrder {
     'shipping': shipping,
     'total': total,
   };
+
+  ShopOrder copyWith({
+    OrderStatus? status,
+    double? subtotal,
+    double? discount,
+    double? shipping,
+    double? total,
+    DateTime? deleted,
+    bool clearDeleted = false,
+  }) {
+    return ShopOrder(
+      id: id,
+      customerId: customerId,
+      status: status ?? this.status,
+      subtotal: subtotal ?? this.subtotal,
+      discount: discount ?? this.discount,
+      shipping: shipping ?? this.shipping,
+      total: total ?? this.total,
+      created: created,
+      customerName: customerName,
+      deleted: clearDeleted ? null : (deleted ?? this.deleted),
+    );
+  }
 }
 
 class ProductNum {

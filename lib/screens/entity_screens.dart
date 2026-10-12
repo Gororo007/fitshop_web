@@ -155,25 +155,25 @@ class SuppliersScreen extends StatelessWidget {
           build: (s) => _cell(s.contact ?? ''),
         ),
         TableColumnSpec<Supplier>(
-          label: 'Email',
-          build: (s) => _cell(s.email ?? ''),
+          label: 'Телефон',
+          build: (s) => _cell(s.phone ?? ''),
         ),
       ],
       fields: const [
         CrudField(key: 'name', label: 'Название', required: true),
         CrudField(key: 'contact', label: 'Контактное лицо'),
-        CrudField(key: 'email', label: 'Email', type: CrudFieldType.email),
+        CrudField(key: 'phone', label: 'Телефон', type: CrudFieldType.phone),
       ],
       initialValues: (s) => {
         'name': s.name,
         'contact': s.contact,
-        'email': s.email,
+        'phone': s.phone,
       },
       buildEntity: (v, initial) => Supplier(
         id: initial?.id ?? '',
         name: v['name'] as String,
         contact: nullIfBlank(v['contact']),
-        email: nullIfBlank(v['email']),
+        phone: nullIfBlank(v['phone']),
       ),
     );
   }

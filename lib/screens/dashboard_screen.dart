@@ -72,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final links = <_QuickLink>[
       const _QuickLink('Каталог товаров', Icons.storefront, '/products'),
       if (user?.role == UserRole.customer) ...const [
-        _QuickLink('Оформить заказ', Icons.shopping_cart_checkout, '/checkout'),
+        _QuickLink('Корзина', Icons.shopping_cart, '/cart'),
         _QuickLink('Мои заказы', Icons.shopping_bag, '/my-orders'),
       ],
       if (Permissions.isStaff(user)) ...const [

@@ -61,6 +61,11 @@ List<AppShellDestination> destinationsForUser(AppUser? user) {
           path: '/orders',
         ),
         AppShellDestination(
+          label: 'Сборка',
+          icon: Icons.local_shipping_outlined,
+          path: '/fulfillment',
+        ),
+        AppShellDestination(
           label: 'Акции',
           icon: Icons.local_offer,
           path: '/promotions',
@@ -138,14 +143,14 @@ List<AppShellDestination> destinationsForUser(AppUser? user) {
           path: '/products',
         ),
         AppShellDestination(
+          label: 'Корзина',
+          icon: Icons.shopping_cart,
+          path: '/cart',
+        ),
+        AppShellDestination(
           label: 'Мои заказы',
           icon: Icons.shopping_bag,
           path: '/my-orders',
-        ),
-        AppShellDestination(
-          label: 'Оформить',
-          icon: Icons.shopping_cart_checkout,
-          path: '/checkout',
         ),
         AppShellDestination(
           label: 'Отзывы',

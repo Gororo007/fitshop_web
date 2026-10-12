@@ -43,6 +43,7 @@ class PbAuthRepository implements AuthRepository {
       _usersPath,
       data: {
         'email': email,
+        'emailVisibility': true,
         'password': password,
         'passwordConfirm': passwordConfirm,
         'name': name,
@@ -66,18 +67,21 @@ class PbAuthRepository implements AuthRepository {
     if (token == null || token.isEmpty) {
       return null;
     }
-    final recordJson = _prefs.getString(_recordKey);
-    if (recordJson != null && recordJson.isNotEmpty) {
-      try {
-        final map = jsonDecode(recordJson) as Map<String, dynamic>;
-        return AppUser.fromJson(map);
-      } catch (_) {
-        // fall through to refresh
-      }
-    }
+    // Всегда обновляем токен/профиль с сервера, иначе роль и customer
+    // в JWT могут быть устаревшими.
     try {
       return await refreshUser();
     } catch (_) {
+      final recordJson = _prefs.getString(_recordKey);
+      if (recordJson != null && recordJson.isNotEmpty) {
+        try {
+          return AppUser.fromJson(
+            jsonDecode(recordJson) as Map<String, dynamic>,
+          );
+        } catch (_) {
+          // fall through
+        }
+      }
       await logout();
       return null;
     }

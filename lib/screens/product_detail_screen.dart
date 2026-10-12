@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../core/api_exceptions.dart';
+import '../core/cart_actions.dart';
 import '../core/permissions.dart';
 import '../core/ui_helpers.dart';
 import '../models/category.dart';
@@ -53,23 +54,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     try {
       final product = await productRepo.getById(widget.productId);
       if (product == null) throw const NotFoundException('Товар не найден');
-      final cats = await categoryRepo.list(
-        const ListQuery(perPage: 200, sort: 'name'),
-      );
-      final reviews = await reviewRepo.list(
-        ListQuery(
-          perPage: 50,
-          filter: 'product = "${widget.productId}"',
-          expand: 'customer',
-        ),
-      );
+
+      var categories = <Category>[];
+      try {
+        final cats = await categoryRepo.list(
+          const ListQuery(perPage: 200, sort: 'name'),
+        );
+        categories = cats.items
+            .where((c) => product.categoryIds.contains(c.id))
+            .toList();
+      } catch (_) {
+        // Карточка товара важнее справочника категорий.
+      }
+
+      var reviews = <Review>[];
+      try {
+        final page = await reviewRepo.list(
+          ListQuery(
+            perPage: 50,
+            sort: '-id',
+            filter: 'product = "${widget.productId}"',
+            expand: 'customer',
+          ),
+        );
+        reviews = page.items;
+      } catch (_) {
+        // Отзывы необязательны для показа карточки.
+      }
+
       if (!mounted) return;
       setState(() {
         _product = product;
-        _categories = cats.items
-            .where((c) => product.categoryIds.contains(c.id))
-            .toList();
-        _reviews = reviews.items;
+        _categories = categories;
+        _reviews = reviews;
         _status = LoadStatus.success;
       });
     } catch (e) {
@@ -112,9 +129,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
                 if (isCustomer && !p.isDeleted && p.stock > 0)
                   FilledButton.icon(
-                    onPressed: () => context.go('/checkout?add=${p.id}'),
+                    onPressed: () => addProductToCart(context, p),
                     icon: const Icon(Icons.add_shopping_cart),
-                    label: const Text('В заказ'),
+                    label: const Text('В корзину'),
                   ),
                 if (canManage) ...[
                   const SizedBox(width: 8),

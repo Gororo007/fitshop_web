@@ -195,15 +195,36 @@ class ApiClient {
 
   static String? _extractMessage(Object? data) {
     if (data is Map) {
-      final m = data['message'];
-      if (m is String) return m;
       if (data['data'] is Map) {
         final inner = data['data'] as Map;
-        for (final v in inner.values) {
-          if (v is Map && v['message'] is String) {
-            return v['message'] as String;
+        final parts = <String>[];
+        inner.forEach((key, value) {
+          if (value is Map && value['message'] is String) {
+            final field = '$key';
+            final msg = value['message'] as String;
+            if (field == 'email' && msg.toLowerCase().contains('unique')) {
+              parts.add('Пользователь с таким email уже существует');
+            } else if (field == 'password') {
+              parts.add('Пароль: $msg');
+            } else {
+              parts.add('$field: $msg');
+            }
           }
+        });
+        if (parts.isNotEmpty) return parts.join('; ');
+      }
+      final m = data['message'];
+      if (m is String) {
+        if (m == 'Something went wrong while processing your request.') {
+          return 'Ошибка сервера. Проверьте данные или перезапустите PocketBase.';
         }
+        if (m == 'Failed to authenticate.') {
+          return 'Неверный email или пароль';
+        }
+        if (m.toLowerCase().contains('failed to create')) {
+          return 'Не удалось создать запись. Возможно, email уже занят.';
+        }
+        return m;
       }
     }
     return null;

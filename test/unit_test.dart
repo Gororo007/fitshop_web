@@ -68,6 +68,7 @@ void main() {
       expect(Permissions.canAccessPath(manager, '/fulfillment'), isTrue);
       expect(Permissions.canAccessPath(manager, '/analytics'), isFalse);
       expect(Permissions.canAccessPath(customer, '/fulfillment'), isFalse);
+      expect(Permissions.canAccessPath(customer, '/cart'), isTrue);
       expect(Permissions.canAccessPath(customer, '/checkout'), isTrue);
     });
 

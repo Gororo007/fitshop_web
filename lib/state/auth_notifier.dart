@@ -114,6 +114,12 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearError() {
+    if (_error == null) return;
+    _error = null;
+    notifyListeners();
+  }
+
   Future<void> refreshProfile() async {
     if (!isAuthenticated) return;
     try {

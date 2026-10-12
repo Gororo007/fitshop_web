@@ -82,6 +82,13 @@ function dateField(name) {
   return { name, type: 'date' };
 }
 
+function autodateFields() {
+  return [
+    { name: 'created', type: 'autodate', onCreate: true, onUpdate: false },
+    { name: 'updated', type: 'autodate', onCreate: true, onUpdate: true },
+  ];
+}
+
 function emailField(name) {
   return { name, type: 'email' };
 }
@@ -153,6 +160,7 @@ async function main() {
     name: 'categories',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('name', { required: true }),
       textField('description'),
       dateField('deleted'),
@@ -163,6 +171,7 @@ async function main() {
     name: 'brands',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('name', { required: true }),
       textField('country'),
       dateField('deleted'),
@@ -173,6 +182,7 @@ async function main() {
     name: 'suppliers',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('name', { required: true }),
       textField('contact'),
       textField('phone'),
@@ -184,6 +194,7 @@ async function main() {
     name: 'products',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('name', { required: true }),
       numberField('price', { required: true, min: 0 }),
       numberField('stock', { required: true, min: 0 }),
@@ -212,6 +223,7 @@ async function main() {
     name: 'customers',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('full_name', { required: true }),
       textField('phone'),
       emailField('email'),
@@ -236,6 +248,7 @@ async function main() {
     name: 'loyalty_cards',
     type: 'base',
     fields: [
+      ...autodateFields(),
       relationField('customer', customerId, { required: true }),
       selectField('tier', ['bronze', 'silver', 'gold'], { required: true }),
       numberField('points', { min: 0 }),
@@ -248,6 +261,7 @@ async function main() {
     name: 'promotions',
     type: 'base',
     fields: [
+      ...autodateFields(),
       textField('name', { required: true }),
       numberField('discount_percent', { required: true, min: 0, max: 100 }),
       boolField('active'),
@@ -262,6 +276,7 @@ async function main() {
     name: 'orders',
     type: 'base',
     fields: [
+      ...autodateFields(),
       relationField('customer', customerId, { required: true }),
       selectField(
         'status',
@@ -280,6 +295,7 @@ async function main() {
     name: 'order_items',
     type: 'base',
     fields: [
+      ...autodateFields(),
       relationField('order', orderId, { required: true }),
       relationField('product', productId, { required: true }),
       numberField('quantity', { required: true, min: 1 }),
@@ -293,6 +309,7 @@ async function main() {
     name: 'reviews',
     type: 'base',
     fields: [
+      ...autodateFields(),
       relationField('product', productId, { required: true }),
       relationField('customer', customerId, { required: true }),
       numberField('rating', { required: true, min: 1, max: 5 }),
@@ -333,24 +350,25 @@ async function main() {
   });
 
   await setRules(token, 'loyalty_cards', {
-    list: `${staff} || @request.auth.customer = customer`,
-    view: `${staff} || @request.auth.customer = customer`,
+    list: `${staff} || @request.auth.customer = customer || customer.user = @request.auth.id`,
+    view: `${staff} || @request.auth.customer = customer || customer.user = @request.auth.id`,
     create: staff,
     update: staff,
     delete: admin,
   });
 
   await setRules(token, 'orders', {
-    list: `${staff} || @request.auth.customer = customer`,
-    view: `${staff} || @request.auth.customer = customer`,
+    list: `${staff} || @request.auth.customer = customer || customer.user = @request.auth.id`,
+    view: `${staff} || @request.auth.customer = customer || customer.user = @request.auth.id`,
     create: auth,
-    update: staff,
+    // Покупатель может отменить свой заказ (откат при ошибке оформления / UI).
+    update: `${staff} || customer.user = @request.auth.id`,
     delete: admin,
   });
 
   await setRules(token, 'order_items', {
-    list: auth,
-    view: auth,
+    list: `${staff} || order.customer.user = @request.auth.id || order.customer = @request.auth.customer`,
+    view: `${staff} || order.customer.user = @request.auth.id || order.customer = @request.auth.customer`,
     create: auth,
     update: staff,
     delete: admin,
@@ -361,6 +379,16 @@ async function main() {
     view: '',
     create: auth,
     update: `${staff} || @request.auth.customer = customer`,
+    delete: admin,
+  });
+
+  // Пользователи: админ видит всех; регистрация открыта.
+  // Смену role режет hook users.pb.js (не-админ не может эскалировать).
+  await setRules(token, 'users', {
+    list: `${admin} || id = @request.auth.id`,
+    view: `${admin} || id = @request.auth.id`,
+    create: '',
+    update: `${admin} || id = @request.auth.id`,
     delete: admin,
   });
 

@@ -583,11 +583,11 @@
                   },
                   {
                       "id":  "_pb_users_auth_",
-                      "listRule":  "id = @request.auth.id",
-                      "viewRule":  "id = @request.auth.id",
+                      "listRule":  "@request.auth.role = \"admin\" || id = @request.auth.id",
+                      "viewRule":  "@request.auth.role = \"admin\" || id = @request.auth.id",
                       "createRule":  "",
-                      "updateRule":  "id = @request.auth.id",
-                      "deleteRule":  "id = @request.auth.id",
+                      "updateRule":  "@request.auth.role = \"admin\" || id = @request.auth.id",
+                      "deleteRule":  "@request.auth.role = \"admin\"",
                       "name":  "users",
                       "type":  "auth",
                       "fields":  [
@@ -749,7 +749,7 @@
                                       "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != \u0027\u0027"
                                   ],
                       "created":  "2026-10-11 23:14:35.996Z",
-                      "updated":  "2026-10-11 23:24:06.922Z",
+                      "updated":  "2026-10-12 08:17:03.553Z",
                       "system":  false,
                       "authRule":  "",
                       "manageRule":  null,
@@ -882,13 +882,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.887Z",
-                      "updated":  "2026-10-11 23:24:13.282Z",
+                      "updated":  "2026-10-11 23:37:48.533Z",
                       "system":  false
                   },
                   {
@@ -953,13 +973,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.894Z",
-                      "updated":  "2026-10-11 23:24:13.286Z",
+                      "updated":  "2026-10-11 23:37:48.547Z",
                       "system":  false
                   },
                   {
@@ -1038,13 +1078,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.900Z",
-                      "updated":  "2026-10-11 23:24:13.289Z",
+                      "updated":  "2026-10-11 23:37:48.560Z",
                       "system":  false
                   },
                   {
@@ -1172,13 +1232,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.907Z",
-                      "updated":  "2026-10-11 23:24:13.293Z",
+                      "updated":  "2026-10-11 23:37:48.575Z",
                       "system":  false
                   },
                   {
@@ -1267,19 +1347,39 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.916Z",
-                      "updated":  "2026-10-11 23:24:13.302Z",
+                      "updated":  "2026-10-11 23:37:48.588Z",
                       "system":  false
                   },
                   {
                       "id":  "pbc_1191216631",
-                      "listRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer",
-                      "viewRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer",
+                      "listRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer || customer.user = @request.auth.id",
+                      "viewRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer || customer.user = @request.auth.id",
                       "createRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\")",
                       "updateRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\")",
                       "deleteRule":  "@request.auth.role = \"admin\"",
@@ -1350,13 +1450,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
                                       "CREATE UNIQUE INDEX idx_loyalty_customer ON loyalty_cards (customer)"
                                   ],
                       "created":  "2026-10-11 23:24:06.932Z",
-                      "updated":  "2026-10-11 23:24:13.307Z",
+                      "updated":  "2026-10-12 08:29:33.820Z",
                       "system":  false
                   },
                   {
@@ -1463,21 +1583,41 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.940Z",
-                      "updated":  "2026-10-11 23:24:13.298Z",
+                      "updated":  "2026-10-11 23:37:48.617Z",
                       "system":  false
                   },
                   {
                       "id":  "pbc_3527180448",
-                      "listRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer",
-                      "viewRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer",
+                      "listRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer || customer.user = @request.auth.id",
+                      "viewRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || @request.auth.customer = customer || customer.user = @request.auth.id",
                       "createRule":  "@request.auth.id != \"\"",
-                      "updateRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\")",
+                      "updateRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || customer.user = @request.auth.id",
                       "deleteRule":  "@request.auth.role = \"admin\"",
                       "name":  "orders",
                       "type":  "base",
@@ -1584,19 +1724,39 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.945Z",
-                      "updated":  "2026-10-11 23:24:13.312Z",
+                      "updated":  "2026-10-12 08:30:42.772Z",
                       "system":  false
                   },
                   {
                       "id":  "pbc_2456927940",
-                      "listRule":  "@request.auth.id != \"\"",
-                      "viewRule":  "@request.auth.id != \"\"",
+                      "listRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || order.customer.user = @request.auth.id || order.customer = @request.auth.customer",
+                      "viewRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\") || order.customer.user = @request.auth.id || order.customer = @request.auth.customer",
                       "createRule":  "@request.auth.id != \"\"",
                       "updateRule":  "@request.auth.id != \"\" \u0026\u0026 (@request.auth.role = \"manager\" || @request.auth.role = \"admin\")",
                       "deleteRule":  "@request.auth.role = \"admin\"",
@@ -1689,13 +1849,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.951Z",
-                      "updated":  "2026-10-11 23:24:13.319Z",
+                      "updated":  "2026-10-12 08:29:33.828Z",
                       "system":  false
                   },
                   {
@@ -1784,13 +1964,33 @@
                                          "required":  false,
                                          "system":  false,
                                          "type":  "date"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate2990389176",
+                                         "name":  "created",
+                                         "onCreate":  true,
+                                         "onUpdate":  false,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
+                                     },
+                                     {
+                                         "hidden":  false,
+                                         "id":  "autodate3332085495",
+                                         "name":  "updated",
+                                         "onCreate":  true,
+                                         "onUpdate":  true,
+                                         "presentable":  false,
+                                         "system":  false,
+                                         "type":  "autodate"
                                      }
                                  ],
                       "indexes":  [
 
                                   ],
                       "created":  "2026-10-11 23:24:06.956Z",
-                      "updated":  "2026-10-11 23:24:13.324Z",
+                      "updated":  "2026-10-11 23:37:48.669Z",
                       "system":  false
                   }
               ],

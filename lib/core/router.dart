@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../models/app_user.dart';
 import '../screens/analytics_screen.dart';
-import '../screens/checkout_screen.dart';
+import '../screens/cart_screen.dart';
+import '../state/cart_notifier.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/entity_screens.dart';
 import '../screens/forbidden_screen.dart';
@@ -42,7 +43,9 @@ bool canAccessLocation(AppUser? user, String path) {
   if (_staffOnlyPrefixes.any((p) => _matches(path, p))) {
     return Permissions.isStaff(user);
   }
-  if (_matches(path, '/checkout')) return user.role == UserRole.customer;
+  if (_matches(path, '/cart') || _matches(path, '/checkout')) {
+    return user.role == UserRole.customer;
+  }
   return true;
 }
 
@@ -72,10 +75,17 @@ GoRouter createRouter(AuthNotifier auth) {
             : '/login?from=${Uri.encodeQueryComponent(from)}';
       }
       if (isPublic) {
-        return _safeFrom(state.uri.queryParameters['from']) ?? '/';
+        final from = _safeFrom(state.uri.queryParameters['from']);
+        if (from != null && canAccessLocation(user, Uri.parse(from).path)) {
+          return from;
+        }
+        // Покупателя ведём в каталог, сотрудников — на главную.
+        return user.role == UserRole.customer ? '/products' : '/';
       }
       if (path == '/forbidden') return null;
       if (!canAccessLocation(user, path)) return '/forbidden';
+      // Покупатель на «Главной» без пункта меню — в каталог.
+      if (path == '/' && user.role == UserRole.customer) return '/products';
       return null;
     },
     routes: [
@@ -157,10 +167,13 @@ GoRouter createRouter(AuthNotifier auth) {
             builder: (context, state) => const MyOrdersScreen(),
           ),
           GoRoute(
+            path: '/cart',
+            builder: (context, state) => const CartScreen(),
+          ),
+          // Старый URL → корзина (совместимость со ссылками).
+          GoRoute(
             path: '/checkout',
-            builder: (context, state) => CheckoutScreen(
-              initialProductId: state.uri.queryParameters['add'],
-            ),
+            redirect: (context, state) => '/cart',
           ),
           GoRoute(
             path: '/fulfillment',
@@ -190,7 +203,7 @@ class _ShellScaffold extends StatelessWidget {
   int _selectedIndex(List<AppShellDestination> items) {
     // Pages that live under another top-level destination.
     var path = location;
-    if (_matches(path, '/checkout')) path = '/products';
+    if (_matches(path, '/checkout')) path = '/cart';
     if (_matches(path, '/fulfillment')) path = '/orders';
 
     var best = 0;
@@ -219,6 +232,18 @@ class _ShellScaffold extends StatelessWidget {
       onDestinationSelected: (i) => context.go(items[i].path),
       title: 'FitShop',
       actions: [
+        if (user != null && user.role == UserRole.customer)
+          Consumer<CartNotifier>(
+            builder: (context, cart, _) => IconButton(
+              tooltip: 'Корзина',
+              onPressed: () => context.go('/cart'),
+              icon: Badge(
+                isLabelVisible: cart.totalUnits > 0,
+                label: Text('${cart.totalUnits}'),
+                child: const Icon(Icons.shopping_cart_outlined),
+              ),
+            ),
+          ),
         if (user != null)
           Center(
             child: Padding(

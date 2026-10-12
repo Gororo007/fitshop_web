@@ -5,14 +5,14 @@ class Supplier {
     required this.id,
     required this.name,
     this.contact,
-    this.email,
+    this.phone,
     this.deleted,
   });
 
   final String id;
   final String name;
   final String? contact;
-  final String? email;
+  final String? phone;
   final DateTime? deleted;
 
   bool get isDeleted => deleted != null;
@@ -22,14 +22,14 @@ class Supplier {
       id: json['id'] as String,
       name: json['name'] as String? ?? '',
       contact: json['contact'] as String?,
-      email: json['email'] as String?,
+      phone: json['phone'] as String? ?? json['email'] as String?,
       deleted: CategoryDate.parse(json['deleted']),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'name': name,
-    if (contact != null) 'contact': contact,
-    if (email != null) 'email': email,
+    'contact': contact ?? '',
+    'phone': phone ?? '',
   };
 }

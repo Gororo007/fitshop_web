@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../core/ui_helpers.dart';
+import '../core/validators.dart';
 import '../models/app_user.dart';
 import '../models/load_status.dart';
 import '../repositories/user_repository.dart';
@@ -92,6 +94,58 @@ class _UsersScreenState extends State<UsersScreen> {
     }
   }
 
+  Future<void> _createUser() async {
+    final created = await showDialog<_NewUserData>(
+      context: context,
+      builder: (ctx) => const _CreateUserDialog(),
+    );
+    if (created == null || !mounted) return;
+
+    final repo = context.read<UserRepository>();
+    try {
+      await repo.create(
+        email: created.email,
+        name: created.name,
+        password: created.password,
+        role: created.role,
+      );
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Пользователь создан'),
+          content: SelectableText(
+            'Email: ${created.email}\n'
+            'Пароль: ${created.password}\n'
+            'Роль: ${userRoleLabel(created.role)}\n\n'
+            'Сохраните пароль — в базе он хранится только в виде хеша '
+            'и повторно посмотреть его нельзя.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(
+                    text: '${created.email}\n${created.password}',
+                  ),
+                );
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Копировать'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      await _load();
+    } catch (e) {
+      if (mounted) showSnack(context, errorMessage(e), error: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final me = context.watch<AuthNotifier>().user;
@@ -100,9 +154,20 @@ class _UsersScreenState extends State<UsersScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Пользователи',
-            style: Theme.of(context).textTheme.headlineSmall,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Пользователи',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: _createUser,
+                icon: const Icon(Icons.person_add),
+                label: const Text('Создать'),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -204,6 +269,183 @@ class _UsersScreenState extends State<UsersScreen> {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _NewUserData {
+  const _NewUserData({
+    required this.email,
+    required this.name,
+    required this.password,
+    required this.role,
+  });
+
+  final String email;
+  final String name;
+  final String password;
+  final UserRole role;
+}
+
+class _CreateUserDialog extends StatefulWidget {
+  const _CreateUserDialog();
+
+  @override
+  State<_CreateUserDialog> createState() => _CreateUserDialogState();
+}
+
+class _CreateUserDialogState extends State<_CreateUserDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _email = TextEditingController();
+  final _name = TextEditingController();
+  final _password = TextEditingController();
+  final _confirm = TextEditingController();
+  UserRole _role = UserRole.customer;
+  bool _obscure = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Пароль всегда задаётся явно при создании — сразу генерируем рабочий.
+    final generated = PbUserRepository.generatePassword();
+    _password.text = generated;
+    _confirm.text = generated;
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _name.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    super.dispose();
+  }
+
+  void _generatePassword() {
+    final generated = PbUserRepository.generatePassword();
+    setState(() {
+      _password.text = generated;
+      _confirm.text = generated;
+      _obscure = false;
+    });
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+    Navigator.of(context).pop(
+      _NewUserData(
+        email: _email.text.trim(),
+        name: _name.text.trim(),
+        password: _password.text,
+        role: _role,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Новый пользователь'),
+      content: SizedBox(
+        width: 440,
+        child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _name,
+                  decoration: const InputDecoration(
+                    labelText: 'Имя',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) => Validators.requiredField(v, label: 'Имя'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _email,
+                  decoration: const InputDecoration(
+                    labelText: 'Email (логин)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: Validators.email,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _password,
+                  obscureText: _obscure,
+                  decoration: InputDecoration(
+                    labelText: 'Пароль *',
+                    border: const OutlineInputBorder(),
+                    helperText: 'Обязателен: от 8 символов, цифра и спецсимвол',
+                    suffixIcon: IconButton(
+                      tooltip: _obscure ? 'Показать' : 'Скрыть',
+                      icon: Icon(
+                        _obscure ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () => setState(() => _obscure = !_obscure),
+                    ),
+                  ),
+                  validator: Validators.password,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _confirm,
+                  obscureText: _obscure,
+                  decoration: const InputDecoration(
+                    labelText: 'Повтор пароля *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Повторите пароль';
+                    if (v != _password.text) return 'Пароли не совпадают';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: _generatePassword,
+                    icon: const Icon(Icons.casino),
+                    label: const Text('Сгенерировать пароль'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<UserRole>(
+                  initialValue: _role,
+                  decoration: const InputDecoration(
+                    labelText: 'Роль',
+                    border: OutlineInputBorder(),
+                    helperText:
+                        'Покупатель / Менеджер / Администратор — разные разделы',
+                  ),
+                  items: [
+                    for (final r in UserRole.values)
+                      DropdownMenuItem(
+                        value: r,
+                        child: Text(userRoleLabel(r)),
+                      ),
+                  ],
+                  onChanged: (r) {
+                    if (r != null) setState(() => _role = r);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Отмена'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('Создать')),
+      ],
     );
   }
 }

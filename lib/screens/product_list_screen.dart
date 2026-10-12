@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../core/cart_actions.dart';
 import '../core/config.dart';
 import '../core/permissions.dart';
 import '../core/ui_helpers.dart';
@@ -457,9 +458,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       ),
                       if (isCustomer && !p.isDeleted && p.stock > 0)
                         IconButton(
-                          tooltip: 'В заказ',
+                          tooltip: 'В корзину',
                           icon: const Icon(Icons.add_shopping_cart),
-                          onPressed: () => context.go('/checkout?add=${p.id}'),
+                          onPressed: () => addProductToCart(context, p),
                         ),
                       if (canManage && !p.isDeleted)
                         IconButton(

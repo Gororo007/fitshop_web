@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../core/api_client.dart';
 import '../core/ui_helpers.dart';
 import '../features/customer_resolver.dart';
 import '../models/list_query.dart';
@@ -48,7 +49,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     });
     try {
       if (user == null) throw StateError('Требуется авторизация');
-      _customerId ??= (await CustomerResolver(customers).find(user))?.id;
+      _customerId ??= (await CustomerResolver(
+        customers,
+        apiClient: context.read<ApiClient>(),
+      ).ensure(user)).id;
       if (_customerId == null) {
         if (!mounted) return;
         setState(() {
@@ -98,9 +102,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             children: [
               Text('Мои заказы', style: theme.textTheme.headlineSmall),
               FilledButton.icon(
-                onPressed: () => context.go('/checkout'),
-                icon: const Icon(Icons.add_shopping_cart),
-                label: const Text('Новый заказ'),
+                onPressed: () => context.go('/cart'),
+                icon: const Icon(Icons.shopping_cart),
+                label: const Text('Корзина'),
               ),
             ],
           ),
